@@ -2,12 +2,11 @@
     "name": "ws_task",
     "version": "1.0.0",
     "description": "Template for the WebSocket remote control task",
-    "main": "index.js",
+    "main": "index.ts",
     "type": "module",
     "scripts": {
         "start": "node ./index.js",
-        "start:dev": "nodemon ./index.js",
-        "start:prod": "tsc && node dist/server.js",
+        "start:dev": "nodemon",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Andrei Auchynnikau",
@@ -22,6 +21,7 @@
     },
     "dependencies": {
         "@nut-tree/nut-js": "^3.1.1",
+        "tsc": "^2.0.4",
         "ws": "^8.13.0"
     }
 }
