@@ -1,6 +1,6 @@
 import { httpServer } from "./src/http_server/index.js";
-import { mouse, left, right, up, down, Point, Button } from "@nut-tree/nut-js";
-import { WebSocketServer  }  from 'ws';
+import { mouse, left, right, up, down } from "@nut-tree/nut-js";
+import { WebSocketServer }  from 'ws';
 import { drawShape } from "./src/service/drawShape.js";
 import { drawCircle } from "./src/service/drawCircle.js";
 
@@ -19,8 +19,8 @@ socket.on('connection', async (connection) => {
 
   connection.on('message', async message => {
     console.log(message.toString());
-    const [command, num, ...args] = message.toString().split(' ');
-
+    const [command, coord, ...args] = message.toString().split(' ');
+    const number = Number(coord);
     if (command == 'mouse_position') {
       let point = await mouse.getPosition()
       let pos = `mouse_position ${point.x},${point.y}`
@@ -28,25 +28,25 @@ socket.on('connection', async (connection) => {
       connection.send(pos)
     }
     if (command == 'mouse_up') {
-      await mouse.move(up(Number(num)));
+      await mouse.move(up(number));
     }
     if (command == 'mouse_down') {
-      await mouse.move(down(Number(num)));
+      await mouse.move(down(number));
     }
     if (command == 'mouse_left') {
-      await mouse.move(left(Number(num)));
+      await mouse.move(left(number));
     }
     if (command == 'mouse_right') {
-      await mouse.move(right(Number(num)));
+      await mouse.move(right(number));
     }
     if (command == 'draw_square') {
-      drawShape(num, num)
+      drawShape(number, number)
     }
     if (command == 'draw_rectangle') {
-      drawShape(num, args[0])
+      drawShape(number, +args[0])
     }
     if (command == 'draw_circle') {
-      drawCircle(num)
+      drawCircle(number)
     }
     if (command == 'prnt_scrn') {
       console.log(1)

@@ -1,15 +1,20 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as http from 'http';
+import { createReadStream } from 'fs';
+import path, { dirname } from 'path';
+import { createServer, IncomingMessage, ServerResponse } from 'http';
 
-export const httpServer = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-    const __dirname = path.resolve(path.dirname(''));
+export const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
+    const __dirname = path.resolve(dirname(''));
     const file_path = __dirname + (req.url === '/' ? '/front/index.html' : '/front' + req.url);
 
-    const index = fs.readFileSync(file_path, 'utf8');
+    const rs = createReadStream(file_path, 'utf8');
 
-  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-  res.end(index );
+    rs.on('error', (err) => {
+      res.writeHead(404);
+      res.end('File not found');
+    });
+
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    rs.pipe(res)
 });
 
 
