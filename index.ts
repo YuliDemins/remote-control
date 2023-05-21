@@ -1,17 +1,21 @@
 import { httpServer } from "./src/http_server/index.js";
-import { mouse, left, right, up, down } from "@nut-tree/nut-js";
+import { mouse, left, right, up, down, ScreenClass, providerRegistry, Region } from "@nut-tree/nut-js";
 import { WebSocketServer }  from 'ws';
 import { drawShape } from "./src/service/drawShape.js";
 import { drawCircle } from "./src/service/drawCircle.js";
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
+import Jimp from "jimp";
+import { Readable } from "stream";
 
 const HTTP_PORT = process.env.HTTP_PORT || 3000;
 const WS_PORT = process.env.WS_PORT || 8080;
 
-console.log(`Start static http server on the ${HTTP_PORT} port!`);
+console.log(`Start http-server http://localhost:${HTTP_PORT} port`);
 httpServer.listen(+HTTP_PORT);
 
 const socket = new WebSocketServer({ port: +WS_PORT });
-socket.on('listening', () => console.log(WS_PORT))
+socket.on('listening', () => console.log(`Start ws-server ${WS_PORT}`))
 
 socket.on('connection', async (connection) => {
 
@@ -49,7 +53,20 @@ socket.on('connection', async (connection) => {
       drawCircle(number)
     }
     if (command == 'prnt_scrn') {
-      console.log(1)
+      let point = await mouse.getPosition()
+      let xStart = point.x - 100;
+      let yStart = point.y - 100;
+
+      const scrn = new ScreenClass(providerRegistry)
+ 
+      const regionToCapture: Region | Promise<Region> = new Region(xStart, yStart, 200, 200 );
+      let screen = await scrn.captureRegion('screenshot.png', regionToCapture)
+
+      const image = await Jimp.read(screen);
+      const base64 = await image.getBase64Async(Jimp.MIME_PNG);
+      const msg = `prnt_scrn ${base64.split(',')[1]}`
+
+      connection.send(msg )
     }
   });
 
@@ -57,3 +74,9 @@ socket.on('connection', async (connection) => {
     console.log(`Disconnect`);
   });
 });
+
+process.on('SIGINT', async () => {
+  httpServer.close()
+  socket.close()
+  process.exit()
+})
