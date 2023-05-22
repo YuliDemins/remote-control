@@ -14,7 +14,7 @@ export const httpServer = createServer((req: IncomingMessage, res: ServerRespons
     });
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    rs.pipe(res)
+    rs.pipe(res);
 });
 
 

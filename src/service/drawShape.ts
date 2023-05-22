@@ -5,4 +5,4 @@ export const drawShape = async (width: number, height: number) => {
   await mouse.drag(down(Number(height)));
   await mouse.drag(left(Number(width)));
   await mouse.drag(up(Number(height)));
-}
+};
